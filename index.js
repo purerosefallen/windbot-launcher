@@ -12,11 +12,12 @@ var config = loadJSON('./config.json');
 
 var responder = [];
 
-function sendResponse(text) {
-	console.log(text);
+function sendResponse(text, no_show) {
+	if(!no_show)
+		console.log(text);
 	for(var unit of responder) {
 		text=text.replace(/\n/g,"<br>");
-		unit.write(text + "\n\n");
+		unit.write("data: " + text + "\n\n");
 	}
 }
 
@@ -109,8 +110,8 @@ function requestListener(req, res) {
 		res.on("close", get_delete_fun(res));
 		
 		responder.push(res);
-		
-		sendResponse("已连接。");
+		//console.log(responder.length);
+		sendResponse("已连接。", true);
 		
 		
 	}
