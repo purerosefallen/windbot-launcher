@@ -111,8 +111,8 @@ function parseQueryString() {
 function login() {
     ip=$("#ip").val();
     port=$("#port").val();
-    password=$("#password").val();
-	username=$("#username").val();
+    password=encodeURIComponent($("#password").val());
+	username=encodeURIComponent($("#username").val());
     var es = new EventSource($("#http").val() + "://"+ip+":"+port+"/api/msg?username="+username+"&password="+password);
     es.onmessage = function(e) {
         var data_li = $('<li>'+ e.data +'</li>');
@@ -136,7 +136,7 @@ function clear() {
 }
 
 function launch_windbot() {
-    $.getJSON($("#http").val() +"://"+ip+":"+port+"/api/launch?username="+username+"&password="+password+"&ip="+$("#tip").val()+"&port="+$("#tport").val()+"&name="+$("#tuser").val()+"&pass="+$("#tpass").val()+"&deck="+$("#deck").val()+"&callback=?", function(data) {
+    $.getJSON($("#http").val() +"://"+ip+":"+port+"/api/launch?username="+username+"&password="+password+"&ip="+encodeURIComponent($("#tip").val())+"&port="+encodeURIComponent($("#tport").val())+"&name="+encodeURIComponent($("#tuser").val())+"&pass="+encodeURIComponent($("#tpass").val())+"&deck="+encodeURIComponent($("#deck").val())+"&callback=?", function(data) {
         var data_li = $('<li>'+ data.message +'</li>');
         data_li.appendTo($("#output"));
     });
