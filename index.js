@@ -10,14 +10,15 @@ var loadJSON = require('load-json-file').sync;
 
 var config = loadJSON('./config.json');
 
-var responder = [];
+var responder = {};
+var procs = [];
 
-function sendResponse(text, no_show) {
+function sendResponse(login, text, no_show) {
 	if(!no_show)
-		console.log(text);
-	for(var unit of responder) {
+		console.log(login, text);
+	if(responder[login]) {
 		text=text.replace(/\n/g,"<br>");
-		unit.write("data: " + text + "\n\n");
+		responder[login].write("data: " + text + "\n\n");
 	}
 }
 
@@ -27,7 +28,7 @@ function get_name(p) {
 	name_count++;
 }
 
-function launch_windbot(ip, port, name, pass, deck) { 
+function launch_windbot(login, ip, port, name, pass, deck) { 
 	try {
 		var local, params;
 		if (/^win/.test(process.platform)) {
@@ -47,25 +48,37 @@ function launch_windbot(ip, port, name, pass, deck) {
 		params.push('AutoQuit=true');
 		params.push('Debug=true');
 		var proc = child_process.spawn(local, params, { cwd: config.windbot.path });
+		proc.login = login;
+		proc.room_info = {
+			name: name,
+			pass: pass,
+			ip: ip,
+			port: port,
+			deck: deck,
+		};
 		get_name(proc);
+		procs.push(proc);
 		proc.stdout.setEncoding('utf8');
 		proc.stdout.on('data', (function(p) {
 			return function(data) {
-				sendResponse(p.name + " STDOUT: " + data);
+				sendResponse(p.login, p.name + " STDOUT: " + data);
 			}
 		})(proc));
 		proc.stderr.setEncoding('utf8');
 		proc.stderr.on('data', (function(p) {
 			return function(data) {
-				sendResponse(p.name + " STDERR: " + data);
+				sendResponse(p.login, p.name + " STDERR: " + data);
 			}
 		})(proc));
 		proc.on('close', (function(p) {
 			return function(code) {
-				sendResponse('AI ' + p.name + ' 的决斗结束。 (' + code + ')');
+				sendResponse(p.login, 'AI ' + p.name + ' 的决斗结束。 (' + code + ')');
 				if (p.tcounter) {
 					clearTimeout(p.tcounter);
 				}
+				const index = procs.indexOf(p);
+				if (index >= 0)
+					procs.splice(index, 1);
 			}
 		})(proc));
 		proc.tcounter = setTimeout((function(p) {
@@ -73,9 +86,36 @@ function launch_windbot(ip, port, name, pass, deck) {
 				p.kill();
 			}
 		})(proc), 3600000);
-		sendResponse("成功创建AI: " + proc.name);
+		sendResponse(login, "成功创建AI: " + proc.name);
 	} catch (err) { 
-		sendResponse("AI创建失败: " + err);
+		sendResponse(login, "AI创建失败: " + err);
+	}
+}
+
+function terminate(login, ip, port, name, pass, deck) { 
+	var found = false;
+	var kill_list = [];
+	for (var proc of procs) { 
+		//console.log(proc);
+		if (proc &&
+				proc.login === login &&
+				proc.room_info.ip === ip &&
+				proc.room_info.port === port &&
+				proc.room_info.name === name &&
+				proc.room_info.pass === pass &&
+				proc.room_info.deck === deck
+		) { 
+			found = true;
+			kill_list.push(proc);
+		}
+		for (var proc of kill_list) { 
+			proc.kill();
+		}
+	}
+	if (found) {
+		sendResponse(login, "AI中止成功。");
+	} else { 
+		sendResponse(login, "未找到AI。");
 	}
 }
 
@@ -83,12 +123,9 @@ function auth(user, pass) {
 	return config.users[user] && config.users[user] == pass;
 }
 
-function get_delete_fun(res) { 
+function get_delete_fun(login) { 
 	return function () { 
-		const index = responder.indexOf(res);
-		if (index != -1) {
-			responder.splice(index, 1);
-		}
+		delete responder[login];
 	};
 }
 
@@ -96,7 +133,7 @@ function requestListener(req, res) {
 	const u = url.parse(req.url, true);
 	if (!auth(u.query.username, u.query.password)) {
 		res.writeHead(403);
-		res.end("用户名或密码错误。");
+		res.end("Auth failed.");
 		return;
 	}
 	if (u.pathname === '/api/msg') {
@@ -106,12 +143,11 @@ function requestListener(req, res) {
 			"Cache-Control": "no-cache",
 			"Connection": "keep-alive"
 		});
+		res.on("close", get_delete_fun(u.query.username));
 		
-		res.on("close", get_delete_fun(res));
-		
-		responder.push(res);
+		responder[u.query.username] = res;
 		//console.log(responder.length);
-		sendResponse("已连接。", true);
+		sendResponse(u.query.username, "已连接。", true);
 		
 		
 	}
@@ -119,7 +155,12 @@ function requestListener(req, res) {
 	else if (u.pathname === '/api/launch') {
 		res.writeHead(200);
 		res.end(u.query.callback + '({"message":"正在启动AI。"});');
-		launch_windbot(u.query.ip, u.query.port, u.query.name, u.query.pass, u.query.deck);
+		launch_windbot(u.query.username, u.query.ip, u.query.port, u.query.name, u.query.pass, u.query.deck);
+	}
+	else if (u.pathname === '/api/terminate') {
+		res.writeHead(200);
+		res.end(u.query.callback + '({"message":"正在中止AI。"});');
+		terminate(u.query.username, u.query.ip, u.query.port, u.query.name, u.query.pass, u.query.deck);
 	}
     else {
         res.writeHead(400);

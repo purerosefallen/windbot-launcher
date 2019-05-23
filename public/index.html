@@ -56,8 +56,9 @@
                 <option value ="DarkMagician">黑魔术师</option>
             </select>
         </div>
-        <div class="col-lg-1">
+        <div class="col-lg-2">
             <button class="btn btn-default" id="launch">启动</button>
+            <button class="btn btn-default" id="terminate">中止</button>
         </div>
     </div>
 </div>
@@ -84,6 +85,7 @@ $(function(){
     $("#clear_button").click(clear);
     
     $("#launch").click(launch_windbot);
+    $("#terminate").click(terminate);
 
     
     var params=parseQueryString();
@@ -135,6 +137,12 @@ function clear() {
 
 function launch_windbot() {
     $.getJSON($("#http").val() +"://"+ip+":"+port+"/api/launch?username="+username+"&password="+password+"&ip="+$("#tip").val()+"&port="+$("#tport").val()+"&name="+$("#tuser").val()+"&pass="+$("#tpass").val()+"&deck="+$("#deck").val()+"&callback=?", function(data) {
+        var data_li = $('<li>'+ data.message +'</li>');
+        data_li.appendTo($("#output"));
+    });
+}
+function terminate() {
+    $.getJSON($("#http").val() +"://"+ip+":"+port+"/api/terminate?username="+username+"&password="+password+"&ip="+$("#tip").val()+"&port="+$("#tport").val()+"&name="+$("#tuser").val()+"&pass="+$("#tpass").val()+"&deck="+$("#deck").val()+"&callback=?", function(data) {
         var data_li = $('<li>'+ data.message +'</li>');
         data_li.appendTo($("#output"));
     });
