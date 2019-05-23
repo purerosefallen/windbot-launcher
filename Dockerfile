@@ -18,6 +18,6 @@ RUN wget -O /windbot-launcher/windbot/cards.cdb https://github.com/purerosefalle
 
 WORKDIR /windbot-launcher
 EXPOSE 12399
-VOLUME /windbot-launcher/config.json
+# VOLUME /windbot-launcher/config.json
 
 CMD [ "pm2-docker", "start", "/windbot-launcher/index.js" ]
