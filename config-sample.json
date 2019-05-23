@@ -1,0 +1,17 @@
+{
+	"port": 12399,
+	"windbot": {
+		"path": "./windbot",
+		"exec": "WindBot.exe",
+		"version": 4937
+	},
+	"users": {
+		"root": "caivin"
+	},
+	"ssl": {
+		"enabled": false,
+		"port": 12443,
+		"cert": "ssl/fullchain.pem",
+		"key": "ssl/privkey.pem"
+	}
+}

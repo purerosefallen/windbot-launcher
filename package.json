@@ -1,0 +1,22 @@
+{
+  "name": "windbot-launcher",
+  "version": "1.0.0",
+  "description": "A server for launching WindBot.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/purerosefallen/windbot-launcher.git"
+  },
+  "author": "Nanahira",
+  "license": "AGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/purerosefallen/windbot-launcher/issues"
+  },
+  "homepage": "https://github.com/purerosefallen/windbot-launcher#readme",
+  "dependencies": {
+    "load-json-file": "^6.0.0"
+  }
+}
