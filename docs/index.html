@@ -142,7 +142,7 @@ function launch_windbot() {
     });
 }
 function terminate() {
-    $.getJSON($("#http").val() +"://"+ip+":"+port+"/api/terminate?username="+username+"&password="+password+"&ip="+$("#tip").val()+"&port="+$("#tport").val()+"&name="+$("#tuser").val()+"&pass="+$("#tpass").val()+"&deck="+$("#deck").val()+"&callback=?", function(data) {
+    $.getJSON($("#http").val() +"://"+ip+":"+port+"/api/terminate?username="+username+"&password="+password+"&ip="+encodeURIComponent($("#tip").val())+"&port="+encodeURIComponent($("#tport").val())+"&name="+encodeURIComponent($("#tuser").val())+"&pass="+encodeURIComponent($("#tpass").val())+"&deck="+encodeURIComponent($("#deck").val())+"&callback=?", function(data) {
         var data_li = $('<li>'+ data.message +'</li>');
         data_li.appendTo($("#output"));
     });
