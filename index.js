@@ -6,9 +6,7 @@ var http = require('http');
 var https = require('https');
 var child_process = require('child_process');
 var url = require('url');
-var loadJSON = require('load-json-file').sync;
-
-var config = loadJSON('./config.json');
+var config = require('./config.json');
 
 var responder = {};
 var procs = [];
