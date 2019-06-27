@@ -5,8 +5,7 @@ RUN apt update && \
 
 COPY . /windbot-launcher
 WORKDIR /windbot-launcher
-RUN ln -s /windbot /windbot-launcher/windbot && \
-    cp -rf config-sample.json config.json
+RUN ln -s /windbot /windbot-launcher/windbot
 
 EXPOSE 12399
 ENV WINDBOT_USERNAME root
