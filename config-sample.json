@@ -3,7 +3,7 @@
 	"windbot": {
 		"path": "./windbot",
 		"exec": "WindBot.exe",
-		"version": 4937
+		"version": 4938
 	},
 	"users": {
 		"root": "calvin"
