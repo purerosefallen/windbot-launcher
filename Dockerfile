@@ -1,7 +1,7 @@
 FROM nanahira/windbot
 
 RUN apt update && \
-    env DEBIAN_FRONTEND=noninteractive apt install -y nodejs npm
+    env DEBIAN_FRONTEND=noninteractive apt install -y nodejs
 
 COPY . /windbot-launcher
 WORKDIR /windbot-launcher
