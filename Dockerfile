@@ -11,3 +11,6 @@ RUN npm install && \
 
 WORKDIR /windbot-launcher
 EXPOSE 12399
+ENV WINDBOT_USERNAME root
+ENV WINDBOT_PASSWORD calvin
+CMD [ "/windbot-launcher/entrypoint.sh" ]
