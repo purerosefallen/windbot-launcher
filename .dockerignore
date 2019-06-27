@@ -3,3 +3,4 @@ Dockerfile
 .git*
 /docs
 /README.md
+/LICENSE
